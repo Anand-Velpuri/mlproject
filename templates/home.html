@@ -267,7 +267,7 @@
         <div class="card">
 
             <!-- Step 1: Demographics -->
-            <div id="step-1" style="padding:1.75rem;">
+            <div id="step-1" style="padding:1.75rem;{% if results %}display:none;{% endif %}">
                 <div class="section-heading">Personal information</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
                     <div>
@@ -305,7 +305,7 @@
             </div>
 
             <!-- Step 2: Background -->
-            <div id="step-2" style="padding:1.75rem;display:none;">
+            <div id="step-2" style="padding:1.75rem;display:none;{% if results %}display:none;{% endif %}">
                 <div class="section-heading">Academic context</div>
                 <div style="margin-bottom:1.25rem;">
                     <label class="field-label">Lunch type</label>
@@ -357,18 +357,19 @@
             <div id="step-result" style="padding:2rem 1.75rem;text-align:center;">
                 <div style="display:flex;justify-content:center;margin-bottom:1.5rem;">
                     <div
-                        style="position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;">
-                        <svg width="140" height="140" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
-                            <circle cx="70" cy="70" r="58" fill="none" stroke="#eef2ff" stroke-width="10" />
-                            <circle id="score-arc" cx="70" cy="70" r="58" fill="none" stroke="var(--accent)"
-                                stroke-width="10" stroke-linecap="round" stroke-dasharray="364.4"
-                                stroke-dashoffset="{{ 364.4 - (results / 100 * 364.4) }}"
+                        style="position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="160" height="160" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
+                            <circle cx="80" cy="80" r="68" fill="none" stroke="#eef2ff" stroke-width="10" />
+                            <circle id="score-arc" cx="80" cy="80" r="68" fill="none" stroke="var(--accent)"
+                                stroke-width="10" stroke-linecap="round" stroke-dasharray="427.3"
+                                stroke-dashoffset="{{ (427.3 - (results / 100 * 427.3)) | round(2) }}"
                                 style="transition:stroke-dashoffset .8s ease" />
                         </svg>
-                        <div style="z-index:1;">
-                            <div style="font-size:48px;font-weight:600;color:var(--accent);line-height:1;">{{ results }}
+                        <div style="z-index:1; text-align:center;">
+                            <div style="line-height:1; color:var(--accent);">
+                                <span style="font-size:40px; font-weight:700;">{{ '%.2f' | format(results) }}</span>
                             </div>
-                            <div style="font-size:11px;color:#a0a0b0;margin-top:2px;">out of 100</div>
+                            <div style="font-size:11px;color:#a0a0b0;margin-top:4px;">out of 100</div>
                         </div>
                     </div>
                 </div>
@@ -383,17 +384,11 @@
                     <i class="ti ti-refresh" style="font-size:15px;"></i> Predict again
                 </a>
             </div>
-
-            <script>
-                /* Hide stepper + wizard, show result only */
-                document.querySelectorAll('#step-1,#step-2,#step-3').forEach(el => el.style.display = 'none');
-                document.getElementById('nav-bar').style.display = 'none';
-            </script>
             {% endif %}
 
-            <!-- Nav bar -->
+            <!-- Nav bar — hidden server-side when result is present, no JS race condition -->
             <div id="nav-bar"
-                style="padding:1rem 1.75rem;border-top:1px solid #e8e8f0;display:flex;justify-content:space-between;align-items:center;">
+                style="padding:1rem 1.75rem;border-top:1px solid #e8e8f0;{% if results %}display:none;{% else %}display:flex;{% endif %}justify-content:space-between;align-items:center;">
                 <button class="btn-secondary" id="btn-back" onclick="goBack()" style="visibility:hidden;">
                     <i class="ti ti-arrow-left" style="font-size:15px;"></i> Back
                 </button>
