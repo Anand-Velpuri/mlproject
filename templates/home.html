@@ -1,113 +1,506 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Exam Performance Predictor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        :root {
+            --accent: #6366f1;
+            --accent-dark: #4338ca;
+            --accent-light: #eef2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f8f8fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 2rem 1rem;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* ── Stepper ── */
+        .step-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+            flex-shrink: 0;
+            transition: all .3s;
+        }
+
+        .step-dot.done {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .step-dot.active {
+            background: #fff;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .step-dot.idle {
+            background: #f1f1f5;
+            border: 1px solid #e2e2eb;
+            color: #a0a0b0;
+        }
+
+        .step-line {
+            height: 1px;
+            flex: 1;
+            background: #e2e2eb;
+            margin: 0 4px;
+            transition: background .3s;
+        }
+
+        .step-line.done {
+            background: var(--accent);
+        }
+
+        /* ── Card ── */
+        .card {
+            background: #fff;
+            border: 1px solid #e8e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* ── Fields ── */
+        .field-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #5a5a72;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .field-select,
+        .field-input {
+            width: 100%;
+            padding: 0 14px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid #e2e2eb;
+            background: #f9f9fc;
+            color: #1a1a2e;
+            font-size: 14px;
+            outline: none;
+            transition: border .15s, box-shadow .15s;
+            appearance: none;
+        }
+
+        .field-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .field-select:focus,
+        .field-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+
+        /* ── Chips ── */
+        .chip {
+            padding: 7px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+            border: 1px solid #e2e2eb;
+            background: #f9f9fc;
+            color: #5a5a72;
+            cursor: pointer;
+            transition: all .15s;
+            user-select: none;
+        }
+
+        .chip.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .chip:hover:not(.active) {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── Buttons ── */
+        .btn-secondary {
+            padding: 0 20px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e2e2eb;
+            background: #f9f9fc;
+            color: #5a5a72;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-primary {
+            padding: 0 24px;
+            height: 42px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+        }
+
+        .btn-primary:active {
+            transform: scale(.98);
+        }
+
+        /* ── Section heading ── */
+        .section-heading {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #a0a0b0;
+            margin-bottom: 16px;
+        }
+
+        /* ── Score card ── */
+        .score-mini {
+            background: #f9f9fc;
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #e8e8f0;
+        }
+
+        .score-mini .label {
+            font-size: 11px;
+            color: #a0a0b0;
+            margin-bottom: 4px;
+        }
+
+        .score-mini .val {
+            font-size: 20px;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+
+        .score-mini .val.accent {
+            color: var(--accent);
+        }
+    </style>
+</head>
 
 <body>
-    <div class="login">
-        <h1>Student Exam Performance Indicator</h1>
 
-        <form action="{{ url_for('predict_datapoint')}}" method="post">
-            <h1>
-                <legend>Student Exam Performance Prediction</legend>
-            </h1>
-            <div class="mb-3">
-                <label class="form-label">Gender</label>
-                <select class="form-control" name="gender" placeholder="Enter you Gender" required>
-                    <option class="placeholder" selected disabled value="">Select your Gender</option>
-                    <option value="male">
-                        Male
-                    </option>
-                    <option value="female">
-                        Female
-                    </option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Race or Ethnicity</label>
-                <select class="form-control" name="ethnicity" placeholder="Enter you ethnicity" required>
-                    <option class="placeholder" selected disabled value="">Select Ethnicity</option>
-                    <option value="group A">
-                        Group A
-                    </option>
-                    <option value="group B">
-                        Group B
-                    </option>
-                    <option value="group C">
-                        Group C
-                    </option>
-                    <option value="group D">
-                        Group D
-                    </option>
-                    <option value="group E">
-                        Group E
-                    </option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Parental Level of Education</label>
-                <select class="form-control" name="parental_level_of_education" placeholder="Enter you Parent Education"
-                    required>
-                    <option class="placeholder" selected disabled value="">Select Parent Education</option>
-                    <option value="associate's degree">
-                        associate's degree
-                    </option>
-                    <option value="bachelor's degree">
-                        bachelor's degree
-                    </option>
-                    <option value="high school">
-                        high school
-                    </option>
-                    <option value="master's degree">
-                        master's degree
-                    </option>
-                    <option value="some college">
-                        some college
-                    </option>
-                    <option value="some high school">
-                        some high school
-                    </option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Lunch Type</label>
-                <select class="form-control" name="lunch" placeholder="Enter you Lunch" required>
-                    <option class="placeholder" selected disabled value="">Select Lunch Type</option>
-                    <option value="free/reduced">
-                        free/reduced
-                    </option>
-                    <option value="standard">
-                        standard
-                    </option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Test preparation Course</label>
-                <select class="form-control" name="test_preparation_course" placeholder="Enter you Course" required>
-                    <option class="placeholder" selected disabled value="">Select Test_course</option>
-                    <option value="none">
-                        None
-                    </option>
-                    <option value="completed">
-                        Completed
-                    </option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Writing Score out of 100</label>
-                <input class="form-control" type="number" name="reading_score" placeholder="Enter your Reading score"
-                    min='0' max='100' />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Reading Score out of 100</label>
-                <input class="form-control" type="number" name="writing_score" placeholder="Enter your Reading Score"
-                    min='0' max='100' />
-            </div>
-            <div class="mb-3">
-                <input class="btn btn-primary" type="submit" value="Predict your Maths Score" required />
-            </div>
-        </form>
-        <h2>
-            THE prediction is {{results}}
-        </h2>
+    <div class="wrapper">
 
-        <body>
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom:2rem;">
+            <div
+                style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e8e8f0;border-radius:999px;padding:5px 14px;font-size:12px;color:#5a5a72;margin-bottom:14px;">
+                <i class="ti ti-brain" style="font-size:13px;color:var(--accent)"></i>
+                ML-powered prediction
+            </div>
+            <h1 style="font-size:24px;font-weight:600;color:#1a1a2e;margin:0 0 6px;">Student performance predictor</h1>
+            <p style="font-size:14px;color:#5a5a72;margin:0;">Predict a student's math score based on academic and
+                demographic factors</p>
+        </div>
+
+        <!-- Stepper -->
+        <div style="display:flex;align-items:center;padding:0 8px;margin-bottom:.5rem;">
+            <div class="step-dot active" id="dot-1">1</div>
+            <div class="step-line" id="line-1"></div>
+            <div class="step-dot idle" id="dot-2">2</div>
+            <div class="step-line" id="line-2"></div>
+            <div class="step-dot idle" id="dot-3">3</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0 4px;margin-bottom:1.5rem;">
+            <span style="font-size:11px;color:#a0a0b0;width:80px;text-align:center;">Demographics</span>
+            <span style="font-size:11px;color:#a0a0b0;width:80px;text-align:center;">Background</span>
+            <span style="font-size:11px;color:#a0a0b0;width:80px;text-align:center;">Scores</span>
+        </div>
+
+        <!-- Card -->
+        <div class="card">
+
+            <!-- Step 1: Demographics -->
+            <div id="step-1" style="padding:1.75rem;">
+                <div class="section-heading">Personal information</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                    <div>
+                        <label class="field-label" for="gender">Gender</label>
+                        <select class="field-select" id="gender" name="gender">
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field-label" for="ethnicity">Race / ethnicity</label>
+                        <select class="field-select" id="ethnicity" name="ethnicity">
+                            <option value="" disabled selected>Select group</option>
+                            <option value="group A">Group A</option>
+                            <option value="group B">Group B</option>
+                            <option value="group C">Group C</option>
+                            <option value="group D">Group D</option>
+                            <option value="group E">Group E</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="field-label" for="parent_edu">Parental level of education</label>
+                    <select class="field-select" id="parent_edu" name="parental_level_of_education">
+                        <option value="" disabled selected>Select education level</option>
+                        <option value="associate's degree">Associate's degree</option>
+                        <option value="bachelor's degree">Bachelor's degree</option>
+                        <option value="high school">High school</option>
+                        <option value="master's degree">Master's degree</option>
+                        <option value="some college">Some college</option>
+                        <option value="some high school">Some high school</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 2: Background -->
+            <div id="step-2" style="padding:1.75rem;display:none;">
+                <div class="section-heading">Academic context</div>
+                <div style="margin-bottom:1.25rem;">
+                    <label class="field-label">Lunch type</label>
+                    <div style="display:flex;gap:8px;" id="lunch-chips">
+                        <div class="chip" onclick="selectChip('lunch-chips',this,'free/reduced')">Free / reduced</div>
+                        <div class="chip" onclick="selectChip('lunch-chips',this,'standard')">Standard</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="field-label">Test preparation course</label>
+                    <div style="display:flex;gap:8px;" id="prep-chips">
+                        <div class="chip" onclick="selectChip('prep-chips',this,'none')">Not completed</div>
+                        <div class="chip" onclick="selectChip('prep-chips',this,'completed')">Completed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Scores -->
+            <div id="step-3" style="padding:1.75rem;display:none;">
+                <div class="section-heading">Academic scores</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px;">
+                    <div>
+                        <label class="field-label" for="reading">Reading score</label>
+                        <div style="position:relative;">
+                            <input class="field-input" type="number" id="reading" name="reading_score" min="0" max="100"
+                                placeholder="0 – 100" style="padding-right:42px;">
+                            <span
+                                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#a0a0b0;">/100</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label" for="writing">Writing score</label>
+                        <div style="position:relative;">
+                            <input class="field-input" type="number" id="writing" name="writing_score" min="0" max="100"
+                                placeholder="0 – 100" style="padding-right:42px;">
+                            <span
+                                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#a0a0b0;">/100</span>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size:12px;color:#a0a0b0;margin-top:4px;">
+                    <i class="ti ti-info-circle" style="vertical-align:-2px;font-size:13px;margin-right:3px;"></i>
+                    Enter scores between 0 and 100
+                </p>
+            </div>
+
+            <!-- Result panel (shown after Flask returns {{ results }}) -->
+            {% if results %}
+            <div id="step-result" style="padding:2rem 1.75rem;text-align:center;">
+                <div style="display:flex;justify-content:center;margin-bottom:1.5rem;">
+                    <div
+                        style="position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="140" height="140" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
+                            <circle cx="70" cy="70" r="58" fill="none" stroke="#eef2ff" stroke-width="10" />
+                            <circle id="score-arc" cx="70" cy="70" r="58" fill="none" stroke="var(--accent)"
+                                stroke-width="10" stroke-linecap="round" stroke-dasharray="364.4"
+                                stroke-dashoffset="{{ 364.4 - (results / 100 * 364.4) }}"
+                                style="transition:stroke-dashoffset .8s ease" />
+                        </svg>
+                        <div style="z-index:1;">
+                            <div style="font-size:48px;font-weight:600;color:var(--accent);line-height:1;">{{ results }}
+                            </div>
+                            <div style="font-size:11px;color:#a0a0b0;margin-top:2px;">out of 100</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:16px;font-weight:500;color:#1a1a2e;margin-bottom:4px;">Predicted math score</div>
+                <div style="font-size:13px;color:#5a5a72;margin-bottom:1.5rem;">
+                    {% if results >= 90 %}Excellent performance
+                    {% elif results >= 75 %}Good performance
+                    {% elif results >= 60 %}Average performance
+                    {% else %}Needs improvement{% endif %}
+                </div>
+                <a href="/" style="display:inline-flex;align-items:center;gap:6px;" class="btn-secondary">
+                    <i class="ti ti-refresh" style="font-size:15px;"></i> Predict again
+                </a>
+            </div>
+
+            <script>
+                /* Hide stepper + wizard, show result only */
+                document.querySelectorAll('#step-1,#step-2,#step-3').forEach(el => el.style.display = 'none');
+                document.getElementById('nav-bar').style.display = 'none';
+            </script>
+            {% endif %}
+
+            <!-- Nav bar -->
+            <div id="nav-bar"
+                style="padding:1rem 1.75rem;border-top:1px solid #e8e8f0;display:flex;justify-content:space-between;align-items:center;">
+                <button class="btn-secondary" id="btn-back" onclick="goBack()" style="visibility:hidden;">
+                    <i class="ti ti-arrow-left" style="font-size:15px;"></i> Back
+                </button>
+                <span style="font-size:12px;color:#a0a0b0;" id="step-counter">Step 1 of 3</span>
+                <button class="btn-primary" id="btn-next" onclick="goNext()">
+                    Continue <i class="ti ti-arrow-right" style="font-size:15px;"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hidden form — submitted on final step -->
+    <form id="predict-form" method="POST" action="{{ url_for('predict_datapoint') }}" style="display:none;">
+        <input type="hidden" id="f-gender" name="gender">
+        <input type="hidden" id="f-ethnicity" name="ethnicity">
+        <input type="hidden" id="f-edu" name="parental_level_of_education">
+        <input type="hidden" id="f-lunch" name="lunch">
+        <input type="hidden" id="f-prep" name="test_preparation_course">
+        <input type="hidden" id="f-reading" name="reading_score">
+        <input type="hidden" id="f-writing" name="writing_score">
+    </form>
+
+    <script>
+        let currentStep = 1;
+        const chipSelections = {};
+
+        function selectChip(groupId, el, val) {
+            document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            chipSelections[groupId] = val;
+        }
+
+        function updateStepper() {
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('dot-' + i);
+                if (i < currentStep) {
+                    dot.className = 'step-dot done';
+                    dot.innerHTML = '<i class="ti ti-check" style="font-size:13px;"></i>';
+                } else {
+                    dot.className = 'step-dot ' + (i === currentStep ? 'active' : 'idle');
+                    dot.textContent = i;
+                }
+                if (i <= 2) {
+                    document.getElementById('line-' + i).className = 'step-line' + (i < currentStep ? ' done' : '');
+                }
+            }
+            document.getElementById('step-counter').textContent = 'Step ' + currentStep + ' of 3';
+            document.getElementById('btn-back').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
+            const btn = document.getElementById('btn-next');
+            btn.innerHTML = currentStep === 3
+                ? '<i class="ti ti-sparkles" style="font-size:15px;"></i> Predict score'
+                : 'Continue <i class="ti ti-arrow-right" style="font-size:15px;"></i>';
+        }
+
+        function validate() {
+            if (currentStep === 1) {
+                if (!document.getElementById('gender').value) { alert('Please select a gender.'); return false; }
+                if (!document.getElementById('ethnicity').value) { alert('Please select a race/ethnicity.'); return false; }
+                if (!document.getElementById('parent_edu').value) { alert('Please select parental education.'); return false; }
+            }
+            if (currentStep === 2) {
+                if (!chipSelections['lunch-chips']) { alert('Please select a lunch type.'); return false; }
+                if (!chipSelections['prep-chips']) { alert('Please select test prep status.'); return false; }
+            }
+            if (currentStep === 3) {
+                const r = parseInt(document.getElementById('reading').value);
+                const w = parseInt(document.getElementById('writing').value);
+                if (isNaN(r) || r < 0 || r > 100) { alert('Enter a valid reading score (0–100).'); return false; }
+                if (isNaN(w) || w < 0 || w > 100) { alert('Enter a valid writing score (0–100).'); return false; }
+            }
+            return true;
+        }
+
+        function showStep(n) {
+            [1, 2, 3].forEach(i => document.getElementById('step-' + i).style.display = (i === n ? 'block' : 'none'));
+        }
+
+        function goNext() {
+            if (!validate()) return;
+            if (currentStep === 3) { submitForm(); return; }
+            currentStep++;
+            showStep(currentStep);
+            updateStepper();
+        }
+
+        function goBack() {
+            if (currentStep <= 1) return;
+            currentStep--;
+            showStep(currentStep);
+            updateStepper();
+        }
+
+        function submitForm() {
+            document.getElementById('f-gender').value = document.getElementById('gender').value;
+            document.getElementById('f-ethnicity').value = document.getElementById('ethnicity').value;
+            document.getElementById('f-edu').value = document.getElementById('parent_edu').value;
+            document.getElementById('f-lunch').value = chipSelections['lunch-chips'];
+            document.getElementById('f-prep').value = chipSelections['prep-chips'];
+            document.getElementById('f-reading').value = document.getElementById('reading').value;
+            document.getElementById('f-writing').value = document.getElementById('writing').value;
+            document.getElementById('predict-form').submit();
+        }
+
+        updateStepper();
+    </script>
+
+</body>
 
 </html>
